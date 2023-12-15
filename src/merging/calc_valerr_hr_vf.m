@@ -30,7 +30,7 @@ end
 
 %-------------------------------------------------------------------------------
 % Get registered points from each frame: T is such that A = T * B
-[T, rmserr]   = transform(A, B, 1);
+[T, rmserr]   = transform_loc(A, B, 1);
 disp(['RMS error: ',num2str(rmserr*1000),' mm'])
 T
 if file_ext=='.sfp'

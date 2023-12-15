@@ -1,41 +1,39 @@
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 %
 % Simultaneously merge all the scans into 
 %
-%-------------------------------------------------------------------------------
-function [allscans,nomdat] = simulmerg2nominal(allscans0,nomdat,dbg_flg)
+%--------------------------------------------------------------------------
+function [allscans,nomdat] = simulmerg2nominal_loc(allscans0,nomdat,dbg_flg)
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Set parameters
 sclf = linspace(0.5,1.5,15);
 [xscf,yscf,zscf]=meshgrid(sclf,sclf,sclf);
 sclf_ps = [xscf(:) yscf(:) zscf(:)];
-fac  = 1.05;
-fac2 = 1.09;
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 Nsc     = length(allscans0);
 Ts      = cell(size(sclf_ps,1),Nsc);   
 rmserrs = zeros(size(sclf_ps,1),Nsc);
 for n = 1:Nsc
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % Get the indices of the located target points
     tdat   = allscans0(n).tdat;
     is_fnd = find( (isnan(tdat(:,1)) == 0) );
     is_fnd = is_fnd( is_fnd < 257);
     
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % Collect the target and corresponding nominal electrode points
     B  = [tdat(is_fnd,:) ones(length(is_fnd),1)]';
     A0 = nomdat.eeg_mps(is_fnd,:);
     
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % For each scale factor find a best fit between the target points from
     % the point cloud and the nominal electrodes points
     for k = 1:size(sclf_ps,1)
         Atmp = (diag(sclf_ps(k,:))*(A0'))';
         A = [Atmp ones(length(is_fnd),1)]';
-        %-----------------------------------------------------------------------
+        %------------------------------------------------------------------
         % Get registered points from each frame
         % T is such that A = T * B
         [T, rmserr]   = transform_loc(A, B, 1);
@@ -47,26 +45,28 @@ for n = 1:Nsc
 end
 
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Find the best fitting matches
 rmserrsv  = sqrt(sum(rmserrs.^2,2));
 [tmp,k]   = min(rmserrsv);
-disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k,:),1)),' mm'])
-disp(['Best scale factor = ',num2str(sclf_ps(k,:))]);      
+if dbg_flg == 1
+    disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k,:),1)),' mm'])
+    disp(['Best scale factor = ',num2str(sclf_ps(k,:))]);
+end
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Scale the best fitting result
 nomdat.eeg_mps = (diag(sclf_ps(k,:))*(nomdat.eeg_mps'))';
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Transform each scan into the nominal EEG frame
 for n = 1:Nsc
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     tdat    = allscans0(n).tdat; 
     elunlab = allscans0(n).elunlab; 
     locs    = allscans0(n).colobj.Location;
     T       = Ts{k,n};
-    %---------------------------------------------------------------------------    
+    %----------------------------------------------------------------------    
     % Transform each thing: labeled electrodes, unlabeled electrodes, and the 
     % point cloud
     B        = [tdat ones(size(tdat,1),1)]';
@@ -78,7 +78,7 @@ for n = 1:Nsc
     B        = [locs ones(size(locs,1),1)]';
     locs     = (T*B)';
     colobj   = pointCloud(locs(:,1:3), 'Color', allscans0(n).colobj.Color);
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % Remove outliers from the unlabeled electrode list
     if ~isempty(elunlab)        
         ris = [];
@@ -91,7 +91,7 @@ for n = 1:Nsc
         elunlab(ris,:) = [];
     end
     
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % Record the transformed data
     allscans(n).colobj  = colobj;
     allscans(n).tdat    = tdat(:,1:3);
@@ -108,12 +108,12 @@ end
 
 
 
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 if dbg_flg == 1
     figure
     plot(rmserrs)
         
-    %---------------------------------------------------------------------------
+    %----------------------------------------------------------------------
     % Plot the nominal eeg cap and the 
     figure
     set(gcf,'position',[680         394        1109         584])

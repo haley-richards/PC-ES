@@ -3,8 +3,8 @@
 %
 %
 %-------------------------------------------------------------------------------
-function [Bout] = bestfit_nomel_noplot_fullset_loc(tdat,nomdat)
-
+function [Bout,Tout,bestsclf,rms_out] = bestfit_nomel_noplot_fullset_loc(tdat,nomdat,dbg_flg)
+     
 %--------------------------------------------------------------------------
 % Set parameters
 sclf = linspace(0.5,1.5,15);
@@ -39,16 +39,18 @@ end
 
 %--------------------------------------------------------------------------
 % Plot the best fitting matches
-[tmp,k]   = min(rmserrs);
+[rms_out,k]   = min(rmserrs);
 % set(handles.message_texts,'String',['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
 %     ', best scale factor = ',num2str(sclf_ps(k,:))]);          % ', best scale factor = ',num2str(sclf(k))]);
-if size(sclf_ps,1) > 3
-    disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
-        ', best scale factor = ',num2str(sclf_ps(k,:))]);
+if dbg_flg == 1
+    if size(sclf_ps,1) > 3
+        disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
+            ', best scale factor = ',num2str(sclf_ps(k,:))]);
+    end
 end
 Btmp     = (diag(sclf_ps(k,:))*(nomdat.eeg_mps'))';
 Bout     = double((Ts{k}*([Btmp ones(size(nomdat.eeg_mps,1),1)]'))');
 Bout     = Bout(:,1:3);
 %--------------------------------------------------------------------------
 bestsclf = sclf_ps(k,:);
-
+Tout     = Ts{k};

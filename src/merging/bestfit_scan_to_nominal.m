@@ -38,7 +38,7 @@ for k = 1:size(sclf_ps,1)
     %-----------------------------------------------------------------------
     % Get registered points from each frame
     % T is such that A = T * B
-    [T, rmserr]   = transform(A, B, 1);
+    [T, rmserr]   = transform_loc(A, B, 1);
     Ts{k,n}       = T;
     rmserrs(k,n)  = rmserr;
     % rmserrs(k,n)  = max(max( A - (T*B)));

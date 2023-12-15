@@ -12,7 +12,7 @@ function [tdat,n_unlab,n_ellab,elunlab] = auto_label_func_hr(elunlab,tdat,colobj
 
 %--------------------------------------------------------------------------
 % 1. Perform a best-fit between the nominal and registration data.
-nomps0 = bestfit_nomel_noplot_fullset(tdat,nomdat);
+nomps0 = bestfit_nomel_noplot_fullset_loc(tdat,nomdat);
 if dbg_flg == 1
     update_resplot(elunlab,tdat,colobj,nomps0)
     title([num2str(size(elunlab,1)),' unlabeled, ',num2str(length(find( (isnan(tdat(:,1)) == 0) ))),' labeled electrodes'])
@@ -63,7 +63,7 @@ while check == 1
     end
     %------------------------------------------------------------------
     % 1. Perform a best-fit between the nominal and registration data.
-    nomps0 = bestfit_nomel_noplot_fullset(tdat,nomdat);
+    nomps0 = bestfit_nomel_noplot_fullset_loc(tdat,nomdat);
    
     
 end

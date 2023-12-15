@@ -22,7 +22,7 @@ plot3(pgdat.elpos(is_fnd,1)/100,pgdat.elpos(is_fnd,2)/100,pgdat.elpos(is_fnd,3)/
 
 %-------------------------------------------------------------------------------
 % Get registered points from each frame: T is such that A = T * B
-[T, rmserr]   = transform(A, B, 1);
+[T, rmserr]   = transform_loc(A, B, 1);
 disp(['RMS error: ',num2str(rmserr*1000),' mm'])
 T
 valtrans = (T*([pgdat.elpos/100 ones(size(pgdat.elpos,1),1)]'))';

@@ -3,7 +3,7 @@
 %
 %
 %-------------------------------------------------------------------------------
-function [Bout] = bestfit_nomel_noplot_fullset_loc(tdat,nomdat)
+function [Bout,T,best_scf] = bestfit_tdat_to_nomel_noplot_fullset_loc(tdat,nomdat,dbg_flg)
 
 %--------------------------------------------------------------------------
 % Set parameters
@@ -19,17 +19,17 @@ is_fnd = is_fnd( is_fnd < 257);
 
 %--------------------------------------------------------------------------
 % Collect the target and corresponding nominal electrode points
-A  = [tdat(is_fnd,:) ones(length(is_fnd),1)]';
-B0 = nomdat.eeg_mps(is_fnd,:);
+B  = [tdat(is_fnd,:) ones(length(is_fnd),1)]';
+A0 = nomdat.eeg_mps(is_fnd,:);
 
 %--------------------------------------------------------------------------
 % For each scale factor find a best fit between the target points from
 % the point cloud and the nominal electrodes points
 rmserrs = zeros(size(sclf_ps,1),1);
 for k = 1:size(sclf_ps,1)
-    Btmp = (diag(sclf_ps(k,:))*(B0'))';
+    Atmp = (diag(sclf_ps(k,:))*(A0'))';
     % B = [sclf(k)*B0 ones(length(is_fnd),1)]';
-    B = [Btmp ones(length(is_fnd),1)]';
+    A = [Atmp ones(length(is_fnd),1)]';
     %----------------------------------------------------------------------
     % Get registered points from each frame
     [T, rmserr]   = transform_loc(A, B, 1);
@@ -42,13 +42,17 @@ end
 [tmp,k]   = min(rmserrs);
 % set(handles.message_texts,'String',['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
 %     ', best scale factor = ',num2str(sclf_ps(k,:))]);          % ', best scale factor = ',num2str(sclf(k))]);
-if size(sclf_ps,1) > 3
-    disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
-        ', best scale factor = ',num2str(sclf_ps(k,:))]);
+if dbg_flg == 1
+    if size(sclf_ps,1) > 3
+        disp(['Best RMS of matching targets with nominal elecs = ',num2str(round(1000*rmserrs(k),1)),' mm', ...
+            ', best scale factor = ',num2str(sclf_ps(k,:))]);
+    end
 end
-Btmp     = (diag(sclf_ps(k,:))*(nomdat.eeg_mps'))';
-Bout     = double((Ts{k}*([Btmp ones(size(nomdat.eeg_mps,1),1)]'))');
+best_scf = sclf_ps(k,:);
+% Btmp     = (diag(sclf_ps(k,:))*(nomdat.eeg_mps'))';
+Bout     = double((Ts{k}*([tdat ones(size(tdat,1),1)]'))');
 Bout     = Bout(:,1:3);
+T        = Ts{k};
 %--------------------------------------------------------------------------
 bestsclf = sclf_ps(k,:);
 

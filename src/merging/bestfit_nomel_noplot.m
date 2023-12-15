@@ -32,7 +32,7 @@ is_fnd = is_fnd( is_fnd < 257);
 % B = [Btmp ones(length(is_fnd),1)]';
 % %-----------------------------------------------------------------------
 % % Get registered points from each frame
-% T    = transform(A, B, 1);
+% T    = transform_loc(A, B, 1);
 % Btmp = (diag(sclf_ps)*(nomdat.eeg_mps'))';
 % Bout = double((T*([Btmp ones(size(nomdat.eeg_mps,1),1)]'))');
 % elns = 1:257;
@@ -52,7 +52,7 @@ for k = 1:size(sclf_ps,1)
     B = [Btmp ones(length(is_fnd),1)]';
     %-----------------------------------------------------------------------
     % Get registered points from each frame
-    [T, rmserr]   = transform(A, B, 1);
+    [T, rmserr]   = transform_loc(A, B, 1);
     Ts{k}         = T;
     rmserrs(k)    = rmserr;
 end

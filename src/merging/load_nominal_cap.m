@@ -5,18 +5,15 @@
 %-------------------------------------------------------------------------------
 function nomdat = load_nominal_cap(dbg_flg)
 
-load dat/UCL_head_mesh_256eeg_elecs msh el256 eeg_mps
-nomdat.msh     = msh;
+load src/nominal_cap_pts el256 eeg_mps mdl
 nomdat.el256   = el256;
 nomdat.eeg_mps = eeg_mps/100; % convert from cm to mm
-fnm     = 'netModel_ideal.xml';
-mdl     = read_docbrown_file(['dat\',fnm]);
 
 %---------------------------------------------------------------------------
 % Collect the target and corresponding nominal electrode points
 A  = [nomdat.eeg_mps ones(size(nomdat.eeg_mps,1),1)]';
 B  = [mdl.sens_ps/100 ones(258,1)]';
-[T, rmserr]   = transform(A, B(:,1:256), 1);
+[T, rmserr]   = transform_loc(A, B(:,1:256), 1);
 eeg_mps2 = (T*B)';
 
 nomdat.eeg_mps  = [nomdat.eeg_mps; ...
@@ -34,17 +31,17 @@ if dbg_flg == 1
     end
     plot3(nomdat.eeg_mps(256,1),nomdat.eeg_mps(256,2),nomdat.eeg_mps(256,3),'.b','markersize',22)
     plot3(nomdat.eeg_mps(257,1),nomdat.eeg_mps(257,2),nomdat.eeg_mps(257,3),'.g','markersize',22)
-    
+
     figure
     hold on
     plot3(nomdat.eeg_mps(:,1),nomdat.eeg_mps(:,2),nomdat.eeg_mps(:,3),'.k','markersize',12)
     plot3(eeg_mps2(:,1),eeg_mps2(:,2),eeg_mps2(:,3),'.r','markersize',12)
     legend('Brainstorm','photogrammetry system')
-    
+
     figure
     hold on
     mdl
     mdl.sens_ps = nomdat.eeg_mps*100;
-%     mdl.sens_ps = nomdat.eeg_mps2*100;
+    %     mdl.sens_ps = nomdat.eeg_mps2*100;
     plot_docbrown(mdl,'b')
 end

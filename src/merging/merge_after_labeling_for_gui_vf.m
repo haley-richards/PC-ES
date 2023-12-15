@@ -5,9 +5,6 @@
 %-------------------------------------------------------------------------------
 function [colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf(scnpth, scnfls, scnpth_raw, scnfls_raw, valpth, valfnm, subj_name, elthick)
 
-% addpath(genpath('S:\digihisto\Ethan\EKM_Utility'))
-% addpath(genpath('S:\eit\Haley\stroke\Hedges_Gui\gui_v7'))
-
 elthick   = 12/1000;    % electrode thickness
 dethr     = 10/1000;     % Maximum distance to consider for automatic 
                         % labeling of electrodes (m)

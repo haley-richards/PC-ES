@@ -20,7 +20,7 @@ for n = 1:length(scnfls)
     [p,t]       = update_tris_due_to_rmvnodes(locs,tri,ris);
     
     name=scnfls{n}(1:end-4);
-    eval(['save ',scnpth,'\',name,'_rawtris.mat p t'])
+    eval(['save ',scnpth,'/',name,'_rawtris.mat p t'])
     size(t)
     colobj
     %----------------------------------------------------------------------

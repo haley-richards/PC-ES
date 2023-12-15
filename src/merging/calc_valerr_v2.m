@@ -13,7 +13,7 @@ disp([num2str(length(is_fnd)),' Electrodes found'])
 
 %--------------------------------------------------------------------------
 % 1. Perform a best-fit between the nominal and registration data.
-nomps0 = bestfit_nomel_noplot_fullset(tdat_mrg,nomdat);
+nomps0 = bestfit_nomel_noplot_fullset_loc(tdat_mrg,nomdat);
 
 %--------------------------------------------------------------------------
 % Get registered points from each frame: T is such that A = T * B
