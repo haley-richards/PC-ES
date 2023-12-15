@@ -36,7 +36,7 @@ for k = 1:size(sclf_ps,1)
     B = [Btmp ones(length(is_fnd),1)]';
     %-----------------------------------------------------------------------
     % Get registered points from each frame
-    [T, rmserr]   = transform(B, A, 1);
+    [T, rmserr]   = transform_loc(B, A, 1);
     Ts{k}         = T;
     rmserrs(k)    = rmserr;
 end

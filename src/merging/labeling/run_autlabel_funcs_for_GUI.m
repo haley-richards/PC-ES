@@ -12,8 +12,8 @@ function [tdat,elunlab] = run_autlabel_funcs_for_GUI(handles)
 % % save testdat
 % % clear
 dbg_flg = 0;
-addpath(genpath('S:/digihisto/Ethan/EKM_utility'))
 handles
+
 %--------------------------------------------------------------------------
 % Load the nominal cap
 nomdat = load_nominal_cap(0);

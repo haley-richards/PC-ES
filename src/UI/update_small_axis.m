@@ -11,30 +11,33 @@ MS     = str2double(get(handles.MStag,'String'));
 % end
 %--------------------------------------------------------------------------
 % Update the figure
+col_inds = [];
 axes(handles.axes1);
 if isfield(handles, 'is_sub')==1
-if handles.is_sub ==1
-       scn_num=handles.scn_num;
-            switch scn_num
-                case 1
-                    col_inds=handles.pc_sub1;
-              case 2
-                     col_inds=handles.pc_sub2;
-              case 3
-                     col_inds=handles.pc_sub3;
-              case 4
-                     col_inds=handles.pc_sub4;
-            end
-   else
-    pcshow(handles.colobj);         
+    if handles.is_sub ==1
+        scn_num=handles.scn_num;
+        switch scn_num
+            case 1
+                col_inds=handles.pc_sub1;
+            case 2
+                col_inds=handles.pc_sub2;
+            case 3
+                col_inds=handles.pc_sub3;
+            case 4
+                col_inds=handles.pc_sub4;
+        end
+    else
+        pcshow(handles.colobj);
+    end
 end
 
+if ~isempty(col_inds)
+    cols=colobj.Color;
+    locs=colobj.Location;
+    cols(col_inds, :)=repmat([0, 250, 0], length(col_inds), 1);
+    colobj_view=pointCloud(locs,'Color', cols);
+    pcshow(colobj_view)
 end
-cols=colobj.Color;
-locs=colobj.Location;
-cols(col_inds, :)=repmat([0, 250, 0], length(col_inds), 1);
-colobj_view=pointCloud(locs,'Color', cols);
-pcshow(colobj_view)
 % azel = get(handles.mainax,'view');
 % % tic
 % cla

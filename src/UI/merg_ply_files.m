@@ -71,7 +71,7 @@ for n = 1:(length(colobjs)-1)
     ikp           = find( (isnan(A(:,1)) == 0) & (isnan(B(:,1)) == 0) );
     A             = [A(ikp,:) ones(length(ikp),1)]';
     B             = [B(ikp,:) ones(length(ikp),1)]';
-    [T, rmserr]   = transform(A, B, 1);
+    [T, rmserr]   = transform_loc(A, B, 1);
     Bout          = T*B;
     rmserrs(n)    = rmserr;
     num_common(n) = length(ikp);

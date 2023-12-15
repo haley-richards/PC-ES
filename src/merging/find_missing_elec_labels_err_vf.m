@@ -1,4 +1,4 @@
-function [tdat_mrg_fullset, rms, max_err] = find_missing_elec_labels_err_vf(nomdat,pgdat, tdat_mrg,colobj_mrg,dbg_flg, subj_name, file_ext)
+function [tdat_mrg_fullset, rms, max_err] = find_missing_elec_labels_err_v4(nomdat,pgdat, tdat_mrg,colobj_mrg,dbg_flg, subj_name, file_ext)
 %after all of the electrodes have been labeled, perform a best fit to 
 % label the rest and test the error 
 %very similar to calc_valerr 
@@ -25,7 +25,7 @@ for k = 1:size(sclf_ps,1)
         B = [Btmp; ones(1, length(is_fnd))];
         %-----------------------------------------------------------------------
         % Get registered points from each frame
-        [T, rmserr]   = transform(A, B, 1);
+        [T, rmserr]   = transform_loc(A, B, 1);
         Ts{k}         = T;
         rmserrs(k)    = rmserr;        
 end
@@ -85,7 +85,7 @@ B_full = [B0_full; ones(1, 256)];
 %         B_full = [Btmp; ones(1, 256)];
 %         %-----------------------------------------------------------------------
 %         % Get registered points from each frame
-[T, rmserr]   = transform(A_full, B_full, 1);
+[T, rmserr]   = transform_loc(A_full, B_full, 1);
 %         Ts_full{k}         = T;
 %         rmserrs(k)    = rmserr;        
 % end

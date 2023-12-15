@@ -1,5 +1,5 @@
-function [T, rmserr] = transform(Pa, Pb, flag)
-% [T]=transform(Pa,Pb,flag) returns the coordinates transformation relating points
+function [T, rmserr] = transform_loc(Pa, Pb, flag)
+% [T]=transform_loc(Pa,Pb,flag) returns the coordinates transformation relating points
 % in matrices Pa and Pb which are the same points in two different frames.
 %            | x1 x2 ...|
 % Pa or Pb = | y1 y2 ...|
@@ -34,15 +34,20 @@ switch flag
         Pca=mean(PA,2);		% centroid in a
         Pcb=mean(PB,2);		% centroid in b
         
-        qa=zeros(3,size(PA,2));
-        qb=zeros(3,size(PB,2));
-        H=zeros(3,3);
-        for i=1:size(PA,2)	% compute vectors from centroids and the H matrix
-            qa(:,i)=PA(:,i)-Pca;
-            qb(:,i)=PB(:,i)-Pcb;
-            H=H+qa(:,i)*qb(:,i)';	% Note: outer product results in a 3x3 matrix
-        end
+        %         qa=zeros(3,size(PA,2));
+        %         qb=zeros(3,size(PB,2));
+        %         H=zeros(3,3);
+        %         for i=1:size(PA,2)	% compute vectors from centroids and the H matrix
+        %             qa(:,i)=PA(:,i)-Pca;
+        %             qb(:,i)=PB(:,i)-Pcb;
+        %             H=H+qa(:,i)*qb(:,i)';	% Note: outer product results in a 3x3 matrix
+        %
+        %         end
+        qa = PA - repmat(Pca,1,size(PA,2));
+        qb = PB - repmat(Pcb,1,size(PA,2));
+        H  = qa*(qb');
         
+        %----------------------
         [U,S,V]=svd(H);	% Singular Value Decomposition of H
         
         % XDW 2016-12 edit for reflection correction based on
@@ -67,4 +72,8 @@ switch flag
         return
 end
 
-rmserr = rms(disterr(xwIHomo(T*Pb),xwIHomo(Pa)));
+TPb    = T*Pb;
+% errs   = disterr(xwIHomo(T*Pb),xwIHomo(Pa));
+errs   = disterr(TPb(1:3,:),Pa(1:3,:));
+rmserr = sqrt(1/length(errs)*sum(errs.^2));
+% rmserr = rms(disterr(xwIHomo(T*Pb),xwIHomo(Pa)));

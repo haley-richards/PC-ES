@@ -3,7 +3,7 @@
 % merge scans and autolabel
 % 
 %-------------------------------------------------------------------------------
-function [rms_err, rms_fullset]= comp_pg_tdat_vf(tdat_mrg, colobj_mrg, valpth, subj_name, file_ext, savepth)
+function [rms_err, rms_fullset]= comp_pg_tdat(tdat_mrg, colobj_mrg, valpth, subj_name, file_ext, savepth)
 
 % Load the nominal cap
 nomdat = load_nominal_cap(0);
@@ -19,7 +19,7 @@ end
 %compare merged coordinates with photogrammetry 
 shrt_name=subj_name;
 [valtrans, tdat_mrg_filt, rms_err] = calc_valerr_hr_vf(pgdat,tdat_mrg,colobj_mrg,1, file_ext);
-[tdat_mrg_fullset, rms_fullset] = find_missing_elec_labels_err_vf(nomdat,pgdat, tdat_mrg_filt,colobj_mrg,0, subj_name, file_ext);
+[tdat_mrg_fullset, rms_fullset] = find_missing_elec_labels_err_v4(nomdat,pgdat, tdat_mrg_filt,colobj_mrg,0, subj_name, file_ext);
 %nomps0 = calc_valerr_v2(nomdat,tdat_mrg_fullset,colobj_mrg,1,[scnpth_raw,'/',subj_name]);
 
 

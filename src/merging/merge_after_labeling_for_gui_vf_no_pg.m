@@ -3,7 +3,7 @@
 % merge scans and autolabel
 % 
 %-------------------------------------------------------------------------------
-function [colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf_no_pg(scnpth, scnfls, scnpth_raw, scnfls_raw, subj_name, elthick, savepth)
+function [colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf_no_pg(allscans0, subj_name, elthick, savepth)
 %no photogrammetry data involved
 
 elthick   = elthick/1000;    % electrode thickness
@@ -13,11 +13,7 @@ dethr     = 10/1000;     % Maximum distance to consider for automatic
 %-------------------------------------------------------------------------------
 % Load the nominal cap
 nomdat = load_nominal_cap(0);
-%-------------------------------------------------------------------------------
-% Load all the iphone scanning data
-allscans0 = load_iphone_scan_dat_and_rawtris_hr(scnpth,scnfls,scnpth_raw,scnfls_raw,1);
-%close all
-eval(['save ',savepth,'/allscans0.mat allscans0'])
+
 %get rid of unlabeled points that are too close to other points
 dist_thresh=.005;
 count=1;
