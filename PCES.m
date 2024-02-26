@@ -1,4 +1,3 @@
-
 function varargout = PCES(varargin)
 % PCES MATLAB code for PCES.fig
 %      PCES, by itself, creates a new PCES or raises the existing
@@ -56,7 +55,7 @@ function PCES_OpeningFcn(hObject, ~, handles, varargin)
 hObject.Name='PCES';
 handles.output = hObject;
 %add correct paths and home directory
-addpath(genpath(cd))
+addpath(genpath(pwd))
 %load homepage
 im=imread('homepage2.jpg');
 imshow(im)
@@ -79,11 +78,6 @@ function pick_vx_stl_Callback(hObject, eventdata, handles)
 % hObject    handle to pick_vx_stl (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% addpath(genpath('S:/digihisto/Ethan/EKM_utility'))
-% addpath mfiles
-% addpath(genpath('/Volumes/jumbo/digihisto/Ethan/EKM_utility'))
-% addpath mfiles
-% addpath(genpath('/jumbo/digihisto/Ethan/EKM_utility'))
 
 
 %-------------------------------------------------------------------------------
@@ -130,7 +124,7 @@ function crop_ply_dat_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 colobj = handles.colobj;
 handles.plotplane = 0;  % Plot plane cannot be selected
-
+handles.cropped
 %--------------------------------------------------------------------------
 % We want to go through 3 views of the PLY data and crop all the needed
 % data
@@ -187,6 +181,7 @@ function update_ptcld_plot(hObject,handles)
 MS     = str2double(get(handles.MStag,'String'));
 %-------------------------------------------------------------------------------
 % Perform translations of the points
+handles.cropped
 if handles.cropped == 1
     [colobj,tdat,eclks] = update_PLY_pts(handles);
 else
@@ -199,6 +194,7 @@ axes(handles.mainax);
 azel = get(handles.mainax,'view');
 cla
 pcshow(colobj,'Markersize',MS);
+set(gcf,'color',0.94*[1 1 1]);box on
 hold on
 if isfield(handles,'add_bestfit_els') == 1
     if handles.add_bestfit_els == 1
@@ -210,7 +206,7 @@ if isfield(handles,'add_bestfit_els') == 1
     end
 end
 %-------------------------------------------------------------------------------
-axis equal
+axis equal;axis on
 grid on
 box on
 FS = 12;
@@ -633,33 +629,33 @@ function save_btn_Callback(hObject, eventdata, handles)
 %if it is a subscan, merge all the subscans to make a full point cloud
 %before saving
 if isfield(handles, 'is_sub')==1
-if handles.is_sub==1;
-    pc1_locs=handles.pc1.Location;
-pc2_locs=handles.pc2.Location;
-pc3_locs=handles.pc3.Location;
-pc4_locs=handles.pc4.Location;
+    if handles.is_sub==1;
+        pc1_locs=handles.pc1.Location;
+        pc2_locs=handles.pc2.Location;
+        pc3_locs=handles.pc3.Location;
+        pc4_locs=handles.pc4.Location;
 
-pc1_cols=handles.pc1.Color;
-pc2_cols=handles.pc2.Color;
-pc3_cols=handles.pc3.Color;
-pc4_cols=handles.pc4.Color;
+        pc1_cols=handles.pc1.Color;
+        pc2_cols=handles.pc2.Color;
+        pc3_cols=handles.pc3.Color;
+        pc4_cols=handles.pc4.Color;
 
-pc_full_locs=[pc1_locs; pc2_locs; pc3_locs; pc4_locs];
-pc_full_cols=[pc1_cols; pc2_cols; pc3_cols; pc4_cols];
-pc_full=pointCloud(pc_full_locs, 'Color', pc_full_cols);
-handles.colobj=pc_full;
-handles.is_sub=0;
-%handles.scn_num=0;
-  update_ptcld_plot(hObject,handles)
-  set(handles.message_texts,'String', 'changed to fullview for saving')
-guidata(hObject, handles);
-end
+        pc_full_locs=[pc1_locs; pc2_locs; pc3_locs; pc4_locs];
+        pc_full_cols=[pc1_cols; pc2_cols; pc3_cols; pc4_cols];
+        pc_full=pointCloud(pc_full_locs, 'Color', pc_full_cols);
+        handles.colobj=pc_full;
+        handles.is_sub=0;
+        %handles.scn_num=0;
+        update_ptcld_plot(hObject,handles)
+        set(handles.message_texts,'String', 'changed to fullview for saving')
+        guidata(hObject, handles);
+    end
 end
 %-------------------------------------------------------------------------------
 colobj     = handles.colobj;
 file_ini   = handles.file;
 cropped    = handles.cropped;
-%plotplane  = handles.plotplane;
+plotplane  = handles.plotplane;
 
 if cropped == 0
     %---------------------------------------------------------------------------
@@ -731,8 +727,6 @@ function load_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to load_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%addpath(genpath('S:/digihisto/Ethan/EKM_utility'))
-addpath mfiles
 set(handles.message_texts,'String','Loading Cropped PLY data')
 %-------------------------------------------------------------------------------
 [file,path] = uigetfile('*.mat','Load Segmentation Data');
@@ -1063,7 +1057,6 @@ function addbest_fit_els_Callback(hObject, eventdata, handles)
 handles.add_bestfit_els = 0;
 % load dat/UCL_head_mesh_256eeg_elecs msh el256 eeg_mps
 nomdat = load_nominal_cap(0);
-handles.msh     = nomdat.msh;
 handles.el256   = nomdat.el256;
 handles.eeg_mps = nomdat.eeg_mps(1:257,:); % convert from cm to mm
 
@@ -1635,82 +1628,82 @@ function single_targ_label_Callback(hObject, eventdata, handles)
 % hObject    handle to single_targ_label (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-         axes(handles.mainax);
-         im=flip(imread('EGI_black_electrode_map.jpg'));
-         imagesc(im)
-         set(gca, 'YDir','normal')
-          set(gca, 'XDir','normal')
-          set(handles.message_texts, 'Visible', 'off')
-         %title('reference map (black electrodes in red)')
-      if isfield(handles, 'is_sub')==1
-          if handles.is_sub==1
-         update_small_axis(hObject, handles);
-          end
-      end
-          %pcshow(colobj,'Markersize',MS);
-        % Run the projection algorithm
+axes(handles.mainax);
+im=flip(imread('EGI_black_electrode_map.jpg'));
+imagesc(im)
+set(gca, 'YDir','normal')
+set(gca, 'XDir','normal')
+set(handles.message_texts, 'Visible', 'off')
+%title('reference map (black electrodes in red)')
+if isfield(handles, 'is_sub')==1
+    if handles.is_sub==1
+        update_small_axis(hObject, handles);
+    end
+end
+%pcshow(colobj,'Markersize',MS);
+% Run the projection algorithm
 % %         %             save testdat
-        %             clear
-        % newtdats = run_prj_alg(colobj);
-        if isfield(handles,'tdat') == 1        
-            tdat = handles.tdat;
-        else
-            tdat = [];
+%             clear
+% newtdats = run_prj_alg(colobj);
+if isfield(handles,'tdat') == 1
+    tdat = handles.tdat;
+else
+    tdat = [];
+end
+[tdat_out, colobj_out] = run_single_targ_alg_v2_sub(tdat,handles, handles.colobj);
+set(handles.message_texts, 'Visible', 'on')
+
+handles.tdat = tdat_out;
+handles.colobj=colobj_out;
+%handles.eclks    = newtdats;
+update_ptcld_plot(hObject,handles)
+
+%if you are working with a subscan, update the corresponding subscan field
+if isfield(handles, 'is_sub')==1
+    if handles.is_sub==1
+        scn_num=handles.scn_num;
+        switch scn_num
+            case 1
+                handles.pc1=handles.colobj;
+                [pc2]=update_pc_intersection(hObject, handles, 1, 2);
+                [pc3]=update_pc_intersection(hObject, handles, 1, 3) ;
+                [pc4]=update_pc_intersection(hObject, handles, 1, 4) ;
+                handles.pc2=pc2;
+                handles.pc3=pc3;
+                handles.pc4=pc4;
+            case 2
+                handles.pc2=handles.colobj;
+                [pc1]=update_pc_intersection(hObject, handles, 2, 1);
+                [pc3]=update_pc_intersection(hObject, handles, 2, 3) ;
+                [pc4]=update_pc_intersection(hObject, handles, 2, 4) ;
+                handles.pc1=pc1;
+                handles.pc3=pc3;
+                handles.pc4=pc4;
+
+            case 3
+                handles.pc3=handles.colobj;
+                [pc1]=update_pc_intersection(hObject, handles, 3, 1);
+                [pc2]=update_pc_intersection(hObject, handles, 3, 2) ;
+                [pc4]=update_pc_intersection(hObject, handles, 3, 4) ;
+                handles.pc1=pc1;
+                handles.pc2=pc2;
+                handles.pc4=pc4;
+            case 4
+                handles.pc4=handles.colobj;
+                [pc1]=update_pc_intersection(hObject, handles, 4, 1);
+                [pc2]=update_pc_intersection(hObject, handles, 4, 2) ;
+                [pc3]=update_pc_intersection(hObject, handles, 4, 3) ;
+                handles.pc1=pc1;
+                handles.pc2=pc2;
+                handles.pc3=pc3;
         end
-        [tdat_out, colobj_out] = run_single_targ_alg_v2_sub(tdat,handles, handles.colobj);
-        set(handles.message_texts, 'Visible', 'on')
-        
-        handles.tdat = tdat_out;
-        handles.colobj=colobj_out;
-        %handles.eclks    = newtdats;
-        update_ptcld_plot(hObject,handles)
-        
-        %if you are working with a subscan, update the corresponding subscan field
-        if isfield(handles, 'is_sub')==1
-        if handles.is_sub==1
-            scn_num=handles.scn_num;
-            switch scn_num
-                case 1
-                    handles.pc1=handles.colobj;
-                   [pc2]=update_pc_intersection(hObject, handles, 1, 2);
-                   [pc3]=update_pc_intersection(hObject, handles, 1, 3) ;
-                   [pc4]=update_pc_intersection(hObject, handles, 1, 4) ;
-                   handles.pc2=pc2;
-                   handles.pc3=pc3;
-                   handles.pc4=pc4;
-              case 2
-                    handles.pc2=handles.colobj;
-                   [pc1]=update_pc_intersection(hObject, handles, 2, 1);
-                   [pc3]=update_pc_intersection(hObject, handles, 2, 3) ;
-                   [pc4]=update_pc_intersection(hObject, handles, 2, 4) ;
-                   handles.pc1=pc1;
-                   handles.pc3=pc3;
-                   handles.pc4=pc4;
-                    
-              case 3
-                    handles.pc3=handles.colobj;
-                   [pc1]=update_pc_intersection(hObject, handles, 3, 1);
-                   [pc2]=update_pc_intersection(hObject, handles, 3, 2) ;
-                   [pc4]=update_pc_intersection(hObject, handles, 3, 4) ;
-                   handles.pc1=pc1;
-                   handles.pc2=pc2;
-                   handles.pc4=pc4;
-              case 4
-                    handles.pc4=handles.colobj;
-                   [pc1]=update_pc_intersection(hObject, handles, 4, 1);
-                   [pc2]=update_pc_intersection(hObject, handles, 4, 2) ;
-                   [pc3]=update_pc_intersection(hObject, handles, 4, 3) ;
-                   handles.pc1=pc1;
-                   handles.pc2=pc2;
-                   handles.pc3=pc3;
-            end
-        end
-      
-        
-        end
-        %-------------------------------------------------------------------
-        % Update handles structure
-        guidata(hObject, handles);
+    end
+
+
+end
+%-------------------------------------------------------------------
+% Update handles structure
+guidata(hObject, handles);
 
 
 % --- Executes on button press in deidentify_face.
@@ -1726,6 +1719,8 @@ function merge_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %get path and filename info:
+addpath(genpath(pwd))
+
 if isfield(handles, 'subj_name')==0
 set(handles.message_texts, 'String', 'type subject name first')
     set(handles.message_texts, 'String', 'Type subject name')
@@ -1736,17 +1731,16 @@ set(handles.message_texts, 'String', 'type subject name first')
 else
     subj_name=handles.subj_name_btn;
 end
-base_pth=[cd,'\dat\', subj_name]
-scnpth_raw =[base_pth, '\', subj_name,'_raw'];
-cd(scnpth_raw)
-file_info=dir;
+base_pth=[pwd,'/dat/', subj_name]
+scnpth_raw =[base_pth, '/', subj_name,'_raw'];
+file_info=dir(scnpth_raw);
 n_files=size(file_info, 1);
 n_files=n_files-2;
 for i=1:n_files
     scnfls_raw{i}=file_info(i+2).name;
 end
 
-scnpth  =[base_pth,'\', subj_name,'_elfound'];
+scnpth  =[base_pth,'/', subj_name,'_elfound'];
 for i=1:max(size(scnfls_raw))
     temp_name=scnfls_raw{i};
     temp_name=temp_name(1:end-4);
@@ -1754,56 +1748,144 @@ for i=1:max(size(scnfls_raw))
     scnfls{i}=temp_name;
 end   
 %path to cropped .mat files
-scnpth_cropped=[base_pth,'\', subj_name, '\_cropped'];
+scnpth_cropped=[base_pth,'/', subj_name, '/_cropped'];
 %set(handles.message_texts,'String','Extracting Triangles... please wait')
 %extract_tris_for_gui(scnpth, scnpth_raw, scnfls, scnfls_raw)
-%get electrode thickness
+
+%--------------------------------------------------------------------------
+% get electrode thickness
 set(handles.elthick_txt, 'Visible', 'on')
 set(handles.message_texts,'String','Type electrode thickness (mm)');
 uiwait
 elthick=str2num(get(handles.elthick_txt, 'string'));
 uiresume;
+set(handles.elthick_txt, 'Visible', 'off')
 set(handles.message_texts,'String','Merging Scans... please wait')
-%update handles
 guidata(hObject, handles)
-%see what is in the reference folder
-valpth = [base_pth,'\', subj_name, '_pgdat'];
-%make a saving folder if it doesnt already exist
-if isfolder([base_pth '\', subj_name, '_saved'])==0
-mkdir([base_pth, '\', subj_name, '_saved'])
-end
-savepth=[base_pth, '\', subj_name, '_saved'];
-if isfolder(valpth)==0 %if no reference data is available
-%proceed with merging
-[colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf_no_pg(scnpth, scnfls, scnpth_raw, scnfls_raw, subj_name, elthick)
-%see if photogrammetry data/comparison is needed  
-handles.colobj=colobj_mrg;
-handles.tdat=tdat_mrg;
-set(handles.message_texts, 'String', 'done merging')
-guidata(hObject, handles)
-else
-  tmp=dir(valpth);
-  name=tmp(3).name;
-  file_ext=name(end-3:end)
-%merge
-[colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf_no_pg(scnpth, scnfls, scnpth_raw, scnfls_raw, subj_name, elthick, savepth)
- set(handles.message_texts, 'String', 'done merging')
- guidata(hObject, handles)
- 
-%compare with photogrammetry. Handles file types .mat and .sfp 
-[rms_err, rms_full]= comp_pg_tdat_vf(tdat_mrg, colobj_mrg, valpth, subj_name, file_ext, savepth)
-    set(handles.message_texts, 'String', 'done comparing reference')
-     guidata(hObject, handles)
-  end
+%--------------------------------------------------------------------------
 
+%--------------------------------------------------------------------------
+% see what is in the reference folder
+valpth = [base_pth,'/', subj_name, '_pgdat'];
+% make a saving folder if it doesnt already exist
+if isfolder([base_pth '/', subj_name, '_saved'])==0
+    mkdir([base_pth, '/', subj_name, '_saved'])
+end
+savepth=[base_pth, '/', subj_name, '_saved'];
+
+
+%--------------------------------------------------------------------------
+% Load all the iphone scanning data
+%close all
+tic
+if filechecker(savepth,'allscans0.mat') == 0    
+    allscans0 = load_iphone_scan_dat_and_rawtris_hr(scnpth,scnfls,scnpth_raw,scnfls_raw,0);
+    set(handles.message_texts,'String','Reading in segmented scans and Triangles from raw PLY files... please wait')
+    eval(['save ',savepth,'/allscans0.mat allscans0'])
+else
+    %----------------------------------------------------------------------
+    % Query the user to load the previous allscans0 file or check if there
+    % are updated to the segmentation scans
+    %----------------------------------------------------------------------
+    % get electrode thickness
+    set(handles.elthick_txt, 'Visible', 'on')
+    set(handles.message_texts,'String','Has segmentation info been updated? Type y/n');
+    uiwait
+    user_rsp = lower(get(handles.elthick_txt, 'string'));
+    uiresume;
+    set(handles.elthick_txt, 'Visible', 'off')
+    set(handles.message_texts,'String','Merging Scans... please wait')
     guidata(hObject, handles)
-%clear all figures that arent the GUI 
+    %----------------------------------------------------------------------
+    if contains(user_rsp,'y')
+        allscans0 = load_iphone_scan_dat_and_rawtris_hr(scnpth,scnfls,scnpth_raw,scnfls_raw,0);
+        set(handles.message_texts,'String','Reading in segmented scans and Triangles from raw PLY files... please wait')
+        eval(['save ',savepth,'/allscans0.mat allscans0'])
+    else
+        eval(['load ',savepth,'/allscans0.mat allscans0'])
+    end
+end
+loading_time = toc;
+
+%--------------------------------------------------------------------------
+% Load the nominal cap
+nomdat = load_nominal_cap(0);
+
+%--------------------------------------------------------------------------
+dethr      = 0.01; % Distance threshold (m)
+dfill      = 0.15;
+outthresh  = 0.02;  % Outlier threshold... (m)
+
+if isfolder(valpth)==0 %if no reference data is available
+    %----------------------------------------------------------------------
+    %proceed with merging
+    % % % [colobj_mrg, tdat_mrg, allscans]= merge_after_labeling_for_gui_vf_no_pg(allscans0, subj_name, elthick)
+    outinf = autolabel_and_merging_func( ...
+        allscans0, nomdat, elthick, dethr, dfill, outthresh, 0);
+    merging_time   = toc - loading_time;
+    
+else
+    %----------------------------------------------------------------------
+    %load photogrammetry data
+    eval(['load ',valpth,'/coordinates'])
+
+    %----------------------------------------------------------------------
+    %merge
+    % % [colobj_mrg, tdat_mrg, allscans] = merge_after_labeling_for_gui_vf_no_pg(allscans0, subj_name, elthick, savepth)
+    outinf = autolabel_and_merging_func( ...
+        allscans0, nomdat, elthick, dethr, dfill, outthresh, 0, elpos);
+    merging_time   = toc - loading_time;
+    set(handles.message_texts, 'String', 'done merging')
+    guidata(hObject, handles)
+
+    %compare with photogrammetry. Handles file types .mat and .sfp
+    % % % [rms_err, rms_full]= comp_pg_tdat(tdat_mrg, colobj_mrg, valpth, subj_name, file_ext, savepth)
+    set(handles.message_texts, 'String', 'done comparing reference')
+    guidata(hObject, handles)
+end
+%--------------------------------------------------------------------------
+% Save the ouput
+eval(['save ',savepth,'/merged_output_res outinf merging_time loading_time'])
+
+%--------------------------------------------------------------------------
+handles.colobj = outinf.colobj_mrg;
+handles.tdat   = outinf.tdat_mrg;
+handles.tri    = outinf.tri_mrg;
+set(handles.message_texts, 'String', ['done merging: ', ...
+    num2str(round(loading_time,1)),'s loading time, ', ...
+    num2str(round(merging_time,1)),'s merging time, results saved to merged_output_res.mat'])
+guidata(hObject, handles)
+
+%--------------------------------------------------------------------------
+% Update the plot
+axes(handles.mainax);
+cla
+locs     = double(outinf.colobj_mrg.Location);        
+col_nds  = double(outinf.colobj_mrg.Color)/255;
+tri      = outinf.tri_mrg;
+col_face = zeros(1,size(tri,1),3);
+col_face(1,:,1) = 1/3*( col_nds(tri(:,1),1)+col_nds(tri(:,2),1)+col_nds(tri(:,3),1) );
+col_face(1,:,2) = 1/3*( col_nds(tri(:,1),2)+col_nds(tri(:,2),2)+col_nds(tri(:,3),2) );
+col_face(1,:,3) = 1/3*( col_nds(tri(:,1),3)+col_nds(tri(:,2),3)+col_nds(tri(:,3),3) );
+patch( ...
+    [locs(tri(:,1),1) locs(tri(:,2),1) locs(tri(:,3),1)]', ...
+    [locs(tri(:,1),2) locs(tri(:,2),2) locs(tri(:,3),2)]', ...
+    [locs(tri(:,1),3) locs(tri(:,2),3) locs(tri(:,3),3)]', ...
+    col_face,'linestyle','none','facealpha',1)
+axis off;axis equal
+view([-40 15])
+% camlight left
+camlight headlight
+
+
+guidata(hObject, handles)
+%clear all figures that arent the GUI
 isfig=1;
 c=2;
 while isfig==1
     if isgraphics(c)==1
-close(c)
-c=c+1;
+        close(c)
+        c=c+1;
     else
         isfig=0;
     end
@@ -1851,6 +1933,7 @@ handles.colobj=colobj_ds;
 handles.colobj0=colobj_ds;
 
 pcshow(colobj)
+set(gcf,'color',0.94*[1 1 1]);box on
 view(2)
 
 set(handles.message_texts, 'String', 'downsampled point cloud')
@@ -1907,6 +1990,7 @@ colobj=handles.colobj;
 tdat=handles.tdat;
 newtdats=handles.newtdats;
 pcshow(colobj)
+set(gcf,'color',0.94*[1 1 1]);box on
 plot3(tdat(:, 1), tdat(:, 2), tdat(:, 3), 'r.', 'MarkerSize', 30)
 plot3(newtdats(:, 1), newtdats(:, 2), newtdats(:, 3), 'b.', 'MarkerSize', 20)
 
@@ -1942,24 +2026,24 @@ function fol_set_up_Callback(hObject, eventdata, handles)
 % hObject    handle to fol_set_up (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-seldir = uigetdir(cd, 'Select Directory with .ply files');
+seldir = uigetdir(pwd, 'Select Directory with .ply files');
 set(handles.message_texts,'String', 'Setting up Folders');
 %get names of pointcloud
 pcs=dir(seldir);
 pcs={pcs(3:end).name};
 subj_name=handles.subj_name;
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_raw']);
-dest=[cd, '\dat\', subj_name, '\', subj_name, '_raw'];
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_saved'])
+mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_raw']);
+dest=[pwd, '/dat/', subj_name, '/', subj_name, '_raw'];
+mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_saved'])
 %move files
 for j=1:length(pcs)
-    source=[seldir, '\', pcs{j}];
-    dest=[cd, '\dat\', subj_name, '\', subj_name, '_raw\', pcs{j}];
+    source=[seldir, '/', pcs{j}];
+    dest=[pwd, '/dat/', subj_name, '/', subj_name, '_raw/', pcs{j}];
     copyfile(source, dest)
 end
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_elfound']);
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_cropped']);
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_pgdat']);
+mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_elfound']);
+mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_cropped']);
+mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_pgdat']);
 set(handles.message_texts,'String', 'Done Setting up Folders');
 set(handles.fol_set_up, 'Visible', 'off')
 guidata(hObject, handles);
@@ -2030,39 +2114,39 @@ function upload_ref_dat_Callback(hObject, eventdata, handles)
 % hObject    handle to upload_ref_dat (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[file,path] = uigetfile;
+[file,path] = uigetfile({'*.mat;*.sfp','Reference files (*.mat,*.sfp)'});
+
 %get subject name
 if isfield(handles, 'subj_name')==1
-subj_name=handles.subj_name;
+    subj_name=handles.subj_name;
 else
     set(handles.message_texts, 'String', 'Type subject name')
     set(handles.subj_name_btn, 'Visible', 'on')
     uiwait;
     set(handles.subj_name_btn, 'Visible', 'off')
     subj_name=get(handles.subj_name_btn,'String');
-end 
+end
 %set up pgdat folders if it doesnt already exist
-folderName=[cd, '\dat\', subj_name, '\', subj_name, '_pgdat']
+folderName=[pwd, '/dat/', subj_name, '/', subj_name, '_pgdat'];
 if isfolder(folderName)==0
-%make directories 
-mkdir([cd, '\dat\', subj_name, '\', subj_name, '_pgdat']);
+    %make directories
+    mkdir([pwd, '/dat/', subj_name, '/', subj_name, '_pgdat']);
 end
 %move reference file to the correct directory
-base_pth=[cd, '\dat'];
-
-    source=[path, file] ;
-    dest=[base_pth,'\', subj_name, '\', subj_name '_pgdat'];
-    %read and save as .mat file 
-    file_ext=file(end-3:end);
+base_pth=[pwd, '/dat'];
+source=[path, file] ;
+dest=[base_pth,'/', subj_name, '/', subj_name '_pgdat'];
+%read and save as .mat file
+file_ext=file(end-2:end);
 switch file_ext
     case 'sfp'
-pgdat = load_photogram_dat(path, file);
-elpos=pgdat.elpos;
-eval(['save ', [dest,'\coordinates.mat'], ' elpos']);
+        pgdat = load_photogram_dat(path, file);
+        elpos=pgdat.elpos;
+        eval(['save ', [dest,'/coordinates.mat'], ' elpos']);
     case '..mat'
         copyfile(source, dest)
 end
- set(handles.message_texts, 'String', 'Done setting up reference data')
+set(handles.message_texts, 'String', 'Done setting up reference data')
 guidata(hObject, handles);
 %--------------------------------------------------------------------------
 %BYE
